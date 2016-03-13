@@ -1,14 +1,24 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace MessageAPI.Models
 {
-    public class Request<T> where T: class
+    public class BaseMessage<T> where T: class
     {
-        public string clientId { get; set; }
+        public string ClientId { get; set; }
+        
+        [Required]
         public T Message { get; set; }
     }
 
-    public class TopicMessage : Request<string>
+    public class Message : BaseMessage<string>
     {
+        [Required]
         public string TopicId { get; set; }
+
+        [Required]
+        public string SubscriptionName { get; set; }
     }
+
+    
 }

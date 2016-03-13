@@ -11,28 +11,53 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace MessageAPI.Controllers
 {
-    public class MessagesController : ApiController
+    public class MessagesController : SignalRHubController<AzureServieBusHub>
     {
+        private readonly string _connectionString; 
+        public MessagesController()
+        {
+            _connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");    
+        }
 
-        //Client will Send the message (Client could be mobile or windows , console)
-        public IHttpActionResult SendMessage(TopicMessage message)
+        [HttpPost]
+        public IHttpActionResult PublishMessage(Message message)
         {
             try
             {
+                if (ModelState.IsValid)
+                {
 
-                var connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
+                    var namespaceManager = NamespaceManager.CreateFromConnectionString(_connectionString);
 
-                TopicClient tpClient = TopicClient.CreateFromConnectionString(connectionString, "TestTopic");
+                    //TopicCreation
+                    if (!namespaceManager.TopicExists(message.TopicId))
+                    {
+                        TopicDescription td = new TopicDescription(message.TopicId);
+                        td.MaxSizeInMegabytes = 5120;
+                        td.DefaultMessageTimeToLive = new TimeSpan(0, 0, 60);
+                        namespaceManager.CreateTopic(message.TopicId);
+                    }
 
-                BrokeredMessage topicMessage = new BrokeredMessage(message.Message);
+                    //Subscription Creation;
+                    if (!namespaceManager.SubscriptionExists(message.TopicId, message.SubscriptionName))
+                    {
+                        namespaceManager.CreateSubscription(message.TopicId, message.SubscriptionName);
+                    }
 
-                // Set additional custom app-specific property.
-                topicMessage.Properties["MessageNumber"] = message.TopicId;
 
-                tpClient.Send(topicMessage);
+                    TopicClient tpClient = TopicClient.CreateFromConnectionString(_connectionString, message.TopicId);
 
+                    BrokeredMessage topicMessage = new BrokeredMessage(message.Message);
 
+                    // Set additional custom app-specific property.
+                    topicMessage.Properties["MessageNumber"] = message.TopicId;
+
+                    tpClient.Send(topicMessage);
+
+                }
+                
                 return StatusCode(HttpStatusCode.NoContent);
+
             }
             catch (Exception ex)
             {
@@ -41,6 +66,44 @@ namespace MessageAPI.Controllers
             }
         }
 
+
+        [HttpGet]
+        public void SubscribeToTopic(string topicId, string subscriptionName, string clientId)
+        {
+            
+
+            SubscriptionClient subscriptionClient = SubscriptionClient.CreateFromConnectionString(_connectionString, topicId, subscriptionName);
+
+            // Configure the callback options.
+            OnMessageOptions options = new OnMessageOptions();
+
+            options.AutoComplete = false;
+
+            options.AutoRenewTimeout = TimeSpan.FromSeconds(10);
+
+            subscriptionClient.OnMessage((message) =>
+            {
+                try
+                {
+
+                    var responsemessage = new Message() { SubscriptionName =subscriptionName, Message = message.GetBody<string>()};
+
+                    
+                    // Process message from subscription.
+                    Hub.Clients.Group(clientId).onReceiveMessage(responsemessage);
+
+                    // Remove message from subscription.
+                    message.Complete();
+                }
+                catch (Exception ex)
+                {
+                    // Indicates a problem, unlock message in subscription.
+                    message.Abandon();
+
+                    Hub.Clients.Group(clientId).onErrorMessage("Error While getting the message from the respective subscription");
+                }
+            }, options);
+        }
 
     }
 }

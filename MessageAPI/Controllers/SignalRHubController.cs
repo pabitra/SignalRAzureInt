@@ -4,6 +4,7 @@ using System.Web.Http;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
+
 namespace MessageAPI.Controllers
 {
     public abstract class SignalRHubController<THub> : ApiController where THub : IHub
@@ -15,7 +16,7 @@ namespace MessageAPI.Controllers
             get { return hub.Value; }
         }
 
-
+        
 
     }
 }

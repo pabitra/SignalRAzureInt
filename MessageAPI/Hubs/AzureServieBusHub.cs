@@ -20,41 +20,41 @@ namespace MessageAPI.Hubs
         }
         
 
-        public void Publish(string clientId)
-        {
+        //public void Publish(string clientId)
+        //{
 
-            var connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
+        //    var connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
 
-            SubscriptionClient subscriptionClient = SubscriptionClient.CreateFromConnectionString(connectionString, "TestTopic", "AllMessages");
+        //    SubscriptionClient subscriptionClient = SubscriptionClient.CreateFromConnectionString(connectionString, "TestTopic", "AllMessages");
 
-            // Configure the callback options.
-            OnMessageOptions options = new OnMessageOptions();
+        //    // Configure the callback options.
+        //    OnMessageOptions options = new OnMessageOptions();
 
-            options.AutoComplete = false;
+        //    options.AutoComplete = false;
 
-            options.AutoRenewTimeout = TimeSpan.FromSeconds(10);
+        //    options.AutoRenewTimeout = TimeSpan.FromSeconds(10);
             
-            subscriptionClient.OnMessage((message) =>
-            {
-                try
-                {
-                    // Process message from subscription.
-                    Clients.Group(clientId).onReceiveMessage(message);
+        //    subscriptionClient.OnMessage((message) =>
+        //    {
+        //        try
+        //        {
+        //            // Process message from subscription.
+        //            Clients.Group(clientId).onReceiveMessage(message);
 
-                    // Remove message from subscription.
-                    message.Complete();
-                }
-                catch (Exception ex)
-                {
-                    // Indicates a problem, unlock message in subscription.
-                    message.Abandon();
+        //            // Remove message from subscription.
+        //            message.Complete();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Indicates a problem, unlock message in subscription.
+        //            message.Abandon();
 
-                    Clients.Group(clientId).onErrorMessage("Internal Server Error...");
-                }
-            }, options);
+        //            Clients.Group(clientId).onErrorMessage("Internal Server Error...");
+        //        }
+        //    }, options);
 
 
            
-        }
+        //}
     }
 }

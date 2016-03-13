@@ -1,8 +1,110 @@
 ﻿<div class="jumbotron">
     <h1>Welcome to Message Api</h1>
+    <div id="clientid">WebClient1</div>
 </div>
 <div class="row">
-    <div class="col-12 jumbotron">
-        
-    </div>
+
+    <form id="topicTarget" class="form-horizontal">
+        <div class="form-group">
+            <label class="col-lg-2 control-label">Topic Name</label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" name="TopicId" placeholder="topic id "/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">Subscription Message Queue Name</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="SubscriptionName" placeholder="topic id "/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">Message to be sent to Topic</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="Message" placeholder="topic id "/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-lg-5">
+                <button type="submit" class="btn btn-primary pull-right">Send Message</button>
+            </div>
+            <div class="col-lg-6">
+            </div>
+        </div>
+        <div>
+            <h3>Messages</h3>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        @*<button type="submit" class="btn btn-primary pull-right">Start the Subscription</button>*@
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <ul id="message"></ul>
+            </div>
+        </div>
+    </form>
+
+
+   
+
+
 </div>
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function() {
+
+            var azureServieBusHub = $.connection.azureServieBusHub;
+
+            $("#topicTarget").submit(function(e) {
+
+                var str = $('#topicTarget').serialize();
+
+                alert(str);
+
+                $.post("/api/Messages", str).done(function(data) {
+
+                    alert("message sent");
+                }).fail(function(error) {
+                    alert("error in sending");
+                });
+
+                e.preventDefault();
+            });
+
+            azureServieBusHub.client.onReceiveMessage = function(result) {
+                // Add the message to the page. 
+                $('#message').append('<li><strong>' + htmlEncode(result.SubscriptionName)
+                    + '</strong>: ' + htmlEncode(result.Message) + '</li>');
+            };
+
+            $.connection.hub.start(function () {
+                var clientId = "WebClient1";
+                azureServieBusHub.server.subscribe(clientId);
+
+            }).done(function() {
+                $.ajax({
+                    method: 'GET',
+                    url: "/api/Messages",
+                    data: { clientId: "WebClient1", topicId: "TestTopic", subscriptionName: "TestSubscription" }
+                });
+            });
+
+        });
+
+        function htmlEncode(value) {
+            var encodedValue = $('<div />').text(value).html();
+            return encodedValue;
+        }
+
+    </script>
+}
