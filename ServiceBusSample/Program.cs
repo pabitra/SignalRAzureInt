@@ -26,21 +26,31 @@ namespace ServiceBusSample
             }
 
             //Subscription Creation;
-            if (!namespaceManager.SubscriptionExists("TestTopic", "AllMessages"))
+            if (!namespaceManager.SubscriptionExists("TestTopic", "TestSubscription"))
             {
-                namespaceManager.CreateSubscription("TestTopic", "AllMessages");
+                namespaceManager.CreateSubscription("TestTopic", "TestSubscription");
             }
 
-            TopicClient tpClient = TopicClient.CreateFromConnectionString(connectionString, "TestTopic");
+          
 
-            BrokeredMessage topicMessage = new BrokeredMessage("Test message " + 100);
+            for (var i = 0; i <= 100; i++)
+            {
+                TopicClient tpClient = TopicClient.CreateFromConnectionString(connectionString, "TestTopic");
 
-            // Set additional custom app-specific property.
-            topicMessage.Properties["MessageNumber"] = 100;
+                BrokeredMessage topicMessage = new BrokeredMessage("Test message " + i);
 
-            tpClient.Send(topicMessage);
+                // Set additional custom app-specific property.
+                topicMessage.Properties["MessageNumber"] = 100;
 
-            SubscriptionClient subscriptionClient = SubscriptionClient.CreateFromConnectionString(connectionString, "TestTopic", "AllMessages");
+                tpClient.Send(topicMessage);
+
+                tpClient.Close();
+            }
+
+            Console.WriteLine("100 message were sent succcessfully");    
+
+            Console.ReadKey();
+            SubscriptionClient subscriptionClient = SubscriptionClient.CreateFromConnectionString(connectionString, "TestTopic", "TestSubscription");
 
             // Configure the callback options.
             OnMessageOptions options = new OnMessageOptions();
