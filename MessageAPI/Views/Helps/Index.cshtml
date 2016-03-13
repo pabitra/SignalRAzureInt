@@ -69,13 +69,13 @@
 
                 var str = $('#topicTarget').serialize();
 
-                alert(str);
+              //  alert(str);
 
                 $.post("/api/Messages", str).done(function(data) {
 
-                    alert("message sent");
+                   // alert("message sent");
                 }).fail(function(error) {
-                    alert("error in sending");
+                   // alert("error in sending");
                 });
 
                 e.preventDefault();
