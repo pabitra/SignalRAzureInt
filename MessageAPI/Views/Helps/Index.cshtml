@@ -87,6 +87,13 @@
                     + '</strong>: ' + htmlEncode(result.Message) + '</li>');
             };
 
+
+            azureServieBusHub.client.onReceiveMessage = function (result) {
+                // Add the message to the page. 
+                $('#message').append('<li><strong>' + htmlEncode(result.SubscriptionName)
+                    + '</strong>: ' + htmlEncode(result.Message) + '</li>');
+            };
+
             $.connection.hub.start(function () {
                 var clientId = "WebClient1";
                 azureServieBusHub.server.subscribe(clientId);

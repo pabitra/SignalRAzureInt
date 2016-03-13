@@ -1,7 +1,6 @@
-﻿
-using System;
+﻿using System;
 using System.Net;
-using System.Web;
+using System.Threading.Tasks;
 using System.Web.Http;
 using MessageAPI.Hubs;
 using MessageAPI.Models;
@@ -20,7 +19,7 @@ namespace MessageAPI.Controllers
         }
 
         [HttpPost]
-        public IHttpActionResult PublishMessage(Message message)
+        public async Task<IHttpActionResult> SendMessage(Message message)
         {
             try
             {
@@ -52,8 +51,7 @@ namespace MessageAPI.Controllers
                     // Set additional custom app-specific property.
                     topicMessage.Properties["MessageNumber"] = message.TopicId;
 
-                    tpClient.Send(topicMessage);
-
+                   await tpClient.SendAsync(topicMessage).ConfigureAwait(false);
                 }
                 
                 return StatusCode(HttpStatusCode.NoContent);
@@ -87,7 +85,6 @@ namespace MessageAPI.Controllers
                 {
 
                     var responsemessage = new Message() { SubscriptionName =subscriptionName, Message = message.GetBody<string>()};
-
                     
                     // Process message from subscription.
                     Hub.Clients.Group(clientId).onReceiveMessage(responsemessage);
