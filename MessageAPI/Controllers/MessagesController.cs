@@ -3,8 +3,10 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using System.Web.WebPages;
 using MessageAPI.Hubs;
 using MessageAPI.Models;
+using Microsoft.Ajax.Utilities;
 using Microsoft.Azure;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -97,22 +99,26 @@ namespace MessageAPI.Controllers
                     AutoRenewTimeout = TimeSpan.FromSeconds(10)
                 };
 
+                
                 subscriptionClient.OnMessage((message) =>
                 {
                     try
                     {
-
-                        var responsemessage = new Message()
+                        if (!subscriptionName.IsNullOrWhiteSpace() && subscriptionName.Equals("TestSubscription", StringComparison.CurrentCultureIgnoreCase))
                         {
-                            SubscriptionName = subscriptionName,
-                            Message = message.GetBody<string>()
-                        };
 
-                        // Process message from subscription.
-                        Hub.Clients.Group(clientId).onReceiveMessage(responsemessage);
+                            var responsemessage = new Message()
+                            {
+                                SubscriptionName = subscriptionName,
+                                Message = message.GetBody<string>()
+                            };
 
-                        // Remove message from subscription.
-                        message.Complete();
+                            // Process message from subscription.
+                            Hub.Clients.Group(clientId).onReceiveMessage(responsemessage);
+
+                            // Remove message from subscription.
+                            message.Complete();
+                        }
                     }
                     catch (Exception ex)
                     {

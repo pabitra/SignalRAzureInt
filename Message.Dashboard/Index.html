@@ -125,7 +125,7 @@
             };
 
             azureServieBusHub.client.onReceiveMessage = function (result) {
-                $('#table').append('<tr><td>' + htmlEncode(result.Message.RoomCode) + "</td><td>" + htmlEncode(result.Message.RecordDateTime) + "</td><td>" + htmlEncode(result.Message.Temperature) + "</td></tr>");
+                $("#roomtemp").append('<tr><td>' + htmlEncode(result.Message.RoomCode) + "</td><td>" + htmlEncode(result.Message.RecordDateTime) + "</td><td>" + htmlEncode(result.Message.Temperature) + "</td></tr>");
             };
 
             $.connection.hub.start(function () {

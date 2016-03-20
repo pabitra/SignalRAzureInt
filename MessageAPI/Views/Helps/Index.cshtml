@@ -89,14 +89,14 @@
             };
 
             $.connection.hub.start(function () {
-                var clientId = "WebClient1";
+                var clientId = "WebClient2";
                 azureServieBusHub.server.subscribe(clientId);
 
             }).done(function() {
                 $.ajax({
                     method: 'GET',
                     url: "/api/Messages/SubscribeToTopic",
-                    data: { clientId: "WebClient1", topicId: "TestTopic", subscriptionName: "TestSubscription" }
+                    data: { clientId: "WebClient2", topicId: "TestTopic", subscriptionName: "TestSubscription" }
                 });
             });
 
