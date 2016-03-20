@@ -39,17 +39,12 @@
                         @*<button type="submit" class="btn btn-primary pull-right">Start the Subscription</button>*@
                     </div>
                 </div>
-
             </div>
             <div class="form-group">
                 <ul id="message"></ul>
             </div>
         </div>
     </form>
-
-
-   
-
 
 </div>
 
@@ -71,20 +66,19 @@
 
               //  alert(str);
 
-                $.post("/api/Messages", str).done(function(data) {
-
-                   // alert("message sent");
+                $.post("/api/Messages/SendMessage", str).done(function(data) {
+                    alert("message sent");
                 }).fail(function(error) {
-                   // alert("error in sending");
+                    alert("error in sending");
                 });
 
                 e.preventDefault();
             });
 
-            azureServieBusHub.client.onReceiveMessage = function(result) {
+            azureServieBusHub.client.onErrorMessage = function (result) {
                 // Add the message to the page. 
-                $('#message').append('<li><strong>' + htmlEncode(result.SubscriptionName)
-                    + '</strong>: ' + htmlEncode(result.Message) + '</li>');
+                $('#message').append('<li><strong>' + htmlEncode("Error")
+                    + '</strong>: ' + htmlEncode(result.message) + '</li>');
             };
 
 
@@ -101,7 +95,7 @@
             }).done(function() {
                 $.ajax({
                     method: 'GET',
-                    url: "/api/Messages",
+                    url: "/api/Messages/SubscribeToTopic",
                     data: { clientId: "WebClient1", topicId: "TestTopic", subscriptionName: "TestSubscription" }
                 });
             });

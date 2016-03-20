@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Message DasoBoard</title>
+    <link href="Content/foundation/foundation.css" rel="stylesheet" />
+    <link href="Content/foundation/foundation.mvc.css" rel="stylesheet" />
+    <link href="Content/foundation/normalize.css" rel="stylesheet" />
+    <link href="Content/animate.css" rel="stylesheet" />
+    <link href="Content/Site.css" rel="stylesheet" />
+    <link href="Content/side-bar.css" rel="stylesheet" />
+</head>
+
+<body class="fadeIn animated">
+    <div class="container">
+
+        <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+                <li class="name">
+                    <a href="#"><strong>FOUNDATION</strong> Dashboard</a>
+                </li>
+                <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+                <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right"></ul>
+                <!-- Left Nav Section -->
+                <ul class="left"></ul>
+            </section>
+        </nav>
+
+        <div id="wrapper">
+            <!-- Sidebar -->
+            <div id="sidebar-wrapper">
+                <ul class="sidebar-nav">
+                    <li class="login">
+                    </li>
+                    <li>
+                        <a href="" alt="Dashboard"><i class="fa fa-home" alt="Home"></i> HOME</a>
+                    </li>
+                    <li>
+                        <a href="" alt="Shortcuts"><i class="fa fa-archive" alt="Sites"></i> SITES</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-server" alt="Servers"></i> SERVERS</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-database" alt="Databases"></i> DATABASES</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-cogs" alt="Hosting"></i> HOSTING</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-cloud" alt="Domain Hosting"></i> DOMAIN HOSTING</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-users" alt="Users"></i> USERS</a>
+                    </li>
+
+                    <li>
+                        <a href=""><i class="fa fa-money" alt="Billing"></i> BILLING</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-area-chart" alt="Reports"></i> REPORTS</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-lock" alt="Contact"></i> PASSWORD MANAGER</a>
+                    </li>
+                    <li>
+                        <a href=""><i class="fa fa-envelope" alt="Contact"></i> CONTACT</a>
+                    </li>
+
+                </ul>
+            </div>
+            <!-- /#sidebar-wrapper -->
+            <!-- Page Content -->
+            <div id="page-content-wrapper">
+                <div class="push-1">
+                    <h3>Messages- Room Temperature</h3>
+                    <br />
+                </div>
+                <div class="row">
+                    <div class="push-1">
+                        <table id="roomtemp" class="table table-striped">
+                            <tr>
+                                <th>Room Code             </th>
+                                <th>Date Time             </th>
+                                <th>Value                 </th>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="error-message">
+                        <ul id="message"></ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /#page-content-wrapper -->
+        </div>
+
+    </div>
+
+    <!--vendor script section-->
+    <script src="Scripts/jquery-2.2.1.js"></script>
+    <script src="Scripts/foundation/foundation.js"></script>
+    <script src="Scripts/jquery.signalR-2.2.0.js"></script>
+    <script src="http://localhost:56738/signalr/hubs"></script>
+
+    <script type="text/javascript">
+
+        var clientId = "WebClient1";
+
+        $(document).ready(function () {
+
+            $.connection.hub.url = 'http://localhost:56738/signalr';
+
+            var azureServieBusHub = $.connection.azureServieBusHub;
+            
+            azureServieBusHub.client.onErrorMessage = function (result) {
+                $('#message').append('<li><strong>' + htmlEncode("Error")
+                    + '</strong>: ' + htmlEncode(result.message) + '</li>');
+
+            };
+
+            azureServieBusHub.client.onReceiveMessage = function (result) {
+                $('#table').append('<tr><td>' + htmlEncode(result.Message.RoomCode) + "</td><td>" + htmlEncode(result.Message.RecordDateTime) + "</td><td>" + htmlEncode(result.Message.Temperature) + "</td></tr>");
+            };
+
+            $.connection.hub.start(function () {
+               
+                azureServieBusHub.server.subscribe(clientId);
+
+            }).done(function () {
+                $.ajax({
+                    method: 'GET',
+                    url: "http://localhost:56738/api/Messages/SubscribeToRoomTemperature",
+                    data: { clientId: clientId, topicId: "TestTopic", subscriptionName: "RoomTemperature" }
+                });
+            });
+
+        });
+
+        function htmlEncode(value) {
+            var encodedValue = $('<div />').text(value).html();
+            return encodedValue;
+        }
+
+    </script>
+
+</body>
+</html>

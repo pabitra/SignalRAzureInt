@@ -9,10 +9,6 @@ namespace MessageAPI.Models
         
         [Required]
         public T Message { get; set; }
-    }
-
-    public class Message : BaseMessage<string>
-    {
         [Required]
         public string TopicId { get; set; }
 
@@ -20,5 +16,21 @@ namespace MessageAPI.Models
         public string SubscriptionName { get; set; }
     }
 
+    public class Message : BaseMessage<string>
+    {
+      
+    }
+
+    public class RoomTemperature
+    {
+        public string RecordDateTime { get; set; }
+        public string RoomCode { get; set; }
+        public double Temperature { get; set; }
+    }
+
+    public class RoomTemperatureMessage : BaseMessage<RoomTemperature>
+    {
+        
+    }
     
 }
