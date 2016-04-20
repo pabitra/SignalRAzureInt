@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message.Dashboard", "Messag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message.Sender", "Message.Sender\Message.Sender.csproj", "{4D15D183-C876-4A3D-8185-116725962404}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAPI", "WebApplication1\SchoolAPI.csproj", "{6595389E-8916-4F7D-89CB-6EC0EB5BC876}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{4D15D183-C876-4A3D-8185-116725962404}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D15D183-C876-4A3D-8185-116725962404}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D15D183-C876-4A3D-8185-116725962404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6595389E-8916-4F7D-89CB-6EC0EB5BC876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6595389E-8916-4F7D-89CB-6EC0EB5BC876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6595389E-8916-4F7D-89CB-6EC0EB5BC876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6595389E-8916-4F7D-89CB-6EC0EB5BC876}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
